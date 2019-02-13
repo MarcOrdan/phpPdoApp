@@ -4,20 +4,28 @@
     $database = new Database;
     $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
-    if($post['submit']){
+    if($_POST['delete']){
+        $delete_id = $_POST['delete_id'];
+        $database->query('DELETE FROM posts WHERE id = :id');
+        $database->bind(':id', $delete_id);
+        $database->execute();
+    }
+
+    if($post['submt']){
+        $id = $post['id'];
         $title = $post['title'];
         $body = $post['body'];
         
-        $database->query('INSERT INTO posts(title,body) VALUES(:title, :body)');
-    
+        #$database->query('INSERT INTO posts(title,body) VALUES(:title, :body)');
+        $database->query('UPDATE posts set title = :title, body = :body WHERE id = :id');
         $database->bind(':title', $title);
         $database->bind(':body', $body);
         $database->bind(':id', $id);
         $database->execute();
         
-        if($database->lastInsertId()){
-           echo '<p>Post Added</p>';
-          }
+      #  if($database->lastInsertId()){
+      #      echo '<p>Post Added</p>';
+      #  }
     }
   
     $database->query('SELECT * FROM posts');
@@ -31,6 +39,10 @@
 
     <h1>ADD POST</h1>
     <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
+        <label for="body">POST ID:</label>
+        <br>
+        <input type="text" name="id" placeholder="Specify ID">
+        <br>
         <label for="body">Interesting Title Here:</label>
         <br>
         <input type="text" name="title" placeholder="Post Title">
@@ -49,6 +61,11 @@
         <div>
             <h3><?php echo $row['title']; ?></h3>
             <p><?php echo $row['body']; ?></p>
+            <br>
+            <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
+                <input type="hidden" name="delete_id" value="<?php echo $row['id']; ?>">
+                <input type="submit" value="Delete" name="delete">
+            </form>
         </div>
     <?php endforeach ?>
     </div>

@@ -5,19 +5,20 @@
     $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
     if($post['submit']){
+        $id = $post['id'];
         $title = $post['title'];
         $body = $post['body'];
         
-        $database->query('INSERT INTO posts(title,body) VALUES(:title, :body)');
-    
+        #$database->query('INSERT INTO posts(title,body) VALUES(:title, :body)');
+        $database->query('UPDATE posts set title = :title, body = :body WHERE id = :id');
         $database->bind(':title', $title);
         $database->bind(':body', $body);
         $database->bind(':id', $id);
         $database->execute();
         
-        if($database->lastInsertId()){
-           echo '<p>Post Added</p>';
-          }
+      #  if($database->lastInsertId()){
+      #      echo '<p>Post Added</p>';
+      #  }
     }
   
     $database->query('SELECT * FROM posts');
@@ -31,6 +32,10 @@
 
     <h1>ADD POST</h1>
     <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
+        <label for="body">POST ID:</label>
+        <br>
+        <input type="text" name="id" placeholder="Specify ID">
+        <br>
         <label for="body">Interesting Title Here:</label>
         <br>
         <input type="text" name="title" placeholder="Post Title">
